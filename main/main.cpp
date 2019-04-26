@@ -4,17 +4,18 @@
 int main()
 {
 	std::string mw_string = { "MW" };
+	Calculator calculator;
 
 	for (;;)
 	{
-		std::string input_string = GettingString();
+		std::string input_string = calculator.GettingString();
 
 		if (input_string == "end")
 			break;
 
 		try
 		{
-			float result = RunCalculator(input_string);
+			float result = calculator.RunCalculator(input_string);
 			if (std::search(input_string.begin(), input_string.end(),
 				mw_string.begin(), mw_string.end()) == input_string.end())
 			{
