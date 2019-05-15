@@ -127,7 +127,7 @@ void Calculator::CheckMultipleOperators(std::string &input_string)
 	}
 }
 
-bool Calculator::DigitCheck(std::string &input_string)
+bool Calculator::DigitCheck(const std::string input_string)
 {
 	int i = 0;
 	for (i = 0; i < input_string.size(); i++)
@@ -144,7 +144,7 @@ bool Calculator::DigitCheck(std::string &input_string)
 		return false;
 }
 
-void Calculator::CommaCheck(std::string &input_string)
+void Calculator::ÑommaCheck(std::string &input_string)
 {
 	std::vector<char> comma = { ',' };
 	std::vector<char>::iterator it;
@@ -259,7 +259,7 @@ void Calculator::NegateRecursion(std::string &input_string)
 	}
 }
 
-size_t Calculator::InsertString(std::string &input_string, std::string &delete_string, std::string &add_string, size_t begin_position, std::vector<char>::iterator &it)
+size_t Calculator::InsertString(std::string &input_string, std::string &delete_string, std::string &add_string, const size_t begin_position, std::vector<char>::iterator &it)
 {
 	std::string insert_string;
 
@@ -284,7 +284,6 @@ void Calculator::SqrtCalculation(std::string &input_string)
 	std::string sqrt_string = { "sqrt" };
 	std::string::iterator it;
 	std::string sqrt_argument;
-	std::string calculation_result_string;
 
 	size_t begin_position = 0;
 	size_t end_position = 0;
@@ -310,16 +309,11 @@ void Calculator::SqrtCalculation(std::string &input_string)
 			float_result = CalculationRPN(sqrt_argument);
 
 			if (float_result < 0)
-			{
 				throw "Error: invalid expression. Impossible to take the root of a negative number.";
-			}
+
 
 			float_result = std::sqrt(float_result);
-
-			FloatToString(float_result, calculation_result_string);
-
-			input_string.erase(begin_position, end_position - begin_position);
-			input_string.insert(begin_position, calculation_result_string);
+			ReplaceInString(begin_position, end_position, float_result, input_string);
 		}
 		else
 		{
@@ -333,7 +327,6 @@ void Calculator::ModCalculation(std::string &input_string)
 	std::string mod_string = { "mod" };
 	std::string mod_argument;
 	std::string::iterator it;
-	std::string calculation_result_string;
 
 	std::string first_argument;
 	std::string second_argument;
@@ -368,22 +361,11 @@ void Calculator::ModCalculation(std::string &input_string)
 			second_argument_float = CalculationRPN(second_argument);
 
 			if (second_argument_float == 0)
-			{
 				throw "Error: invalid expression. Impossible to divide by zero.";
-			}
+		
 
 			float_result = std::fmod(first_argument_float, second_argument_float);
-
-			FloatToString(float_result, calculation_result_string);
-
-			if (float_result <= 0)
-			{
-				AddBracket(calculation_result_string);
-				NegateFormation(calculation_result_string);
-			}
-
-			input_string.erase(begin_position, end_position - begin_position);
-			input_string.insert(begin_position, calculation_result_string);
+			ReplaceInString(begin_position, end_position, float_result, input_string);
 		}
 		else
 		{
@@ -392,8 +374,24 @@ void Calculator::ModCalculation(std::string &input_string)
 	}
 }
 
+void Calculator::ReplaceInString(const size_t begin_position, const size_t end_position, const float float_result, std::string &input_string)
+{
+	std::string calculation_result_string;
 
-void Calculator::SelectionModArguments(std::string match_string, std::string &first_argument, std::string &second_argument, size_t match_string_size)
+	FloatToString(float_result, calculation_result_string);
+
+	if (float_result <= 0)
+	{
+		AddBracket(calculation_result_string);
+		NegateFormation(calculation_result_string);
+	}
+
+	input_string.erase(begin_position, end_position - begin_position);
+	input_string.insert(begin_position, calculation_result_string);
+}
+
+
+void Calculator::SelectionModArguments(const std::string match_string, std::string &first_argument, std::string &second_argument, const size_t match_string_size)
 {
 	for (int i = 1; i < match_string.size(); i++) //Pass '('
 	{
@@ -412,7 +410,7 @@ void Calculator::SelectionModArguments(std::string match_string, std::string &fi
 
 		i++; //Pass ','
 
-		CommaCheck(match_string.substr(i, match_string.size() - i));
+		ÑommaCheck(match_string.substr(i, match_string.size() - i));
 
 		for (int j = i; i < match_string_size - 1; j++) //Pass ')'
 		{
@@ -427,7 +425,7 @@ void Calculator::SelectionModArguments(std::string match_string, std::string &fi
 	}
 }
 
-size_t Calculator::FindingEndOfArgument(size_t begin_position, size_t skipped_string_size, std::string search_string)
+size_t Calculator::FindingEndOfArgument(const size_t begin_position, const size_t skipped_string_size, const std::string search_string)
 {
 	size_t end_position = 0;
 	std::stack<char> bracket_stack;
@@ -461,7 +459,7 @@ size_t Calculator::FindingEndOfArgument(size_t begin_position, size_t skipped_st
 	return end_position;
 }
 
-void Calculator::FloatToString(float &float_result, std::string &calculation_result_string)
+void Calculator::FloatToString(const float float_result, std::string &calculation_result_string)
 {
 	std::stringstream result_stream;
 	result_stream << float_result;
@@ -470,7 +468,7 @@ void Calculator::FloatToString(float &float_result, std::string &calculation_res
 }
 
 
-int Calculator::Prioritization(char symbol)
+int Calculator::Prioritization(const char symbol)
 {
 	switch (symbol)
 	{
@@ -491,7 +489,7 @@ int Calculator::Prioritization(char symbol)
 	}
 }
 
-std::string Calculator::ReversePolishNotation(std::string input_string)
+std::string Calculator::ReversePolishNotation(const std::string input_string)
 {
 	std::vector<char> operators = { '+','-', '(', ')', '*', '/', '^', '=' };
 	std::vector<char>::iterator it;
@@ -505,7 +503,7 @@ std::string Calculator::ReversePolishNotation(std::string input_string)
 		{
 			if (i != 0 && isdigit(input_string.at(i - 1)))
 			{
-				out_string.append(" "); //???????? ?????????? ????? ??? ????????
+				out_string.append(" "); //conditional separation of numbers for convenience
 			}
 
 			if (*it == '(')
@@ -515,26 +513,7 @@ std::string Calculator::ReversePolishNotation(std::string input_string)
 
 			if (*it == '+' || *it == '-' || *it == '*' || *it == '/' || *it == '^')
 			{
-				if (operators_stack.empty())
-				{
-					operators_stack.push(*it);
-				}
-				else
-				{
-					if (Prioritization(*it) > Prioritization(operators_stack.top()))
-					{
-						operators_stack.push(*it);
-					}
-					else
-					{
-						while (!operators_stack.empty() && Prioritization(operators_stack.top()) >= Prioritization(*it))
-						{
-							out_string.push_back(operators_stack.top());
-							operators_stack.pop();
-						}
-						operators_stack.push(*it);
-					}
-				}
+				RPNOperators(operators_stack, out_string, it);
 			}
 
 			if (*it == ')')
@@ -569,7 +548,31 @@ std::string Calculator::ReversePolishNotation(std::string input_string)
 	return out_string;
 }
 
-float Calculator::CalculationRPN(std::string input_string)
+void Calculator::RPNOperators(std::stack<char> &operators_stack, std::string &out_string, std::vector<char>::iterator it)
+{
+	if (operators_stack.empty())
+	{
+		operators_stack.push(*it);
+	}
+	else
+	{
+		if (Prioritization(*it) > Prioritization(operators_stack.top()))
+		{
+			operators_stack.push(*it);
+		}
+		else
+		{
+			while (!operators_stack.empty() && Prioritization(operators_stack.top()) >= Prioritization(*it))
+			{
+				out_string.push_back(operators_stack.top());
+				operators_stack.pop();
+			}
+			operators_stack.push(*it);
+		}
+	}
+}
+
+float Calculator::CalculationRPN(const std::string input_string)
 {
 	std::stack<float> number_stack;
 
@@ -623,7 +626,7 @@ float Calculator::CalculationRPN(std::string input_string)
 	return number_stack.top();
 }
 
-void Calculator::CalculationOperators(char input_string_element, float &right_operand, float &left_operand, float &calculation_result, std::stack<float> &number_stack)
+void Calculator::CalculationOperators(const char input_string_element, float &right_operand, float &left_operand, float &calculation_result, std::stack<float> &number_stack)
 {
 	switch (input_string_element)
 	{
@@ -667,14 +670,14 @@ void Calculator::CalculationOperators(char input_string_element, float &right_op
 }
 
 
-void Calculator::StringToFloat(std::string input_string, float &n, size_t substr_begin_position)
+void Calculator::StringToFloat(const std::string input_string, float &n, const size_t substr_begin_position)
 {
 	std::istringstream number_stream(input_string.substr(substr_begin_position, input_string.size()));
 	number_stream >> n;
 	number_stream.clear();
 }
 
-void Calculator::MemoryWriting(std::string input_string, std::vector<float> &mw_elements, float result)
+void Calculator::MemoryWriting(std::string &input_string, std::vector<float> &mw_elements, const float result)
 {
 	if (isnan(result))
 		throw "Error: You cannot use the MW operation without having the result of the calculation.";
@@ -704,14 +707,13 @@ void Calculator::MemoryWriting(std::string input_string, std::vector<float> &mw_
 	}
 }
 
-void Calculator::MemoryReading(std::string &input_string, std::vector<float> &mw_elements, float result)
+void Calculator::MemoryReading(std::string &input_string, std::vector<float> &mw_elements, const float result)
 {
 	std::string mr_string = { "MR" };
 	std::string::iterator it;
 	std::string mr_insert_string;
 	
 	size_t begin_position = 0;
-	size_t end_position = 0;
 
 	float mr;
 
@@ -738,16 +740,7 @@ void Calculator::MemoryReading(std::string &input_string, std::vector<float> &mw
 					if (isnan(mr))
 						throw "Error: You are trying to call an empty cell in MR operation.";
 
-					if (input_string.size() >= 6 && input_string.at(begin_position + 5) == ']') //n = 10 to 20
-						end_position = begin_position + 5;
-					else if (input_string.size() >= 5 && input_string.at(begin_position + 4) == ']') //n = 0 to 9
-						end_position = begin_position + 4;
-					else
-						throw "Error: invalid expression.";
-
-					input_string.erase(begin_position, end_position - begin_position + 1);
-					FloatToString(mr, mr_insert_string);
-					input_string.insert(begin_position, mr_insert_string);
+					MRReplaceInString(begin_position, input_string, mr);
 				}	
 				else
 				{
@@ -770,4 +763,21 @@ void Calculator::MemoryReading(std::string &input_string, std::vector<float> &mw
 			break;
 		}
 	}
+}
+
+void Calculator::MRReplaceInString(const size_t begin_position, std::string &input_string, const float mr)
+{
+	size_t end_position;
+	std::string mr_insert_string;
+
+	if (input_string.size() >= 6 && input_string.at(begin_position + 5) == ']') //n = 10 to 20
+		end_position = begin_position + 5;
+	else if (input_string.size() >= 5 && input_string.at(begin_position + 4) == ']') //n = 0 to 9
+		end_position = begin_position + 4;
+	else
+		throw "Error: invalid expression.";
+
+	input_string.erase(begin_position, end_position - begin_position + 1);
+	FloatToString(mr, mr_insert_string);
+	input_string.insert(begin_position, mr_insert_string);
 }
